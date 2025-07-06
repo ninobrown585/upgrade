@@ -19,7 +19,7 @@ export const getProduct = async(req, res) => {
 
     try {
         const product = await sql`
-        SELECT * FROM products WHERE id=$[id]
+        SELECT * FROM products WHERE id=${id}
         `
 
         res.status(200).json({ success: true, data: product[0]});
@@ -78,20 +78,21 @@ export const updateProduct = async(req, res) => {
 };
 
 export const deleteProduct = async(req, res) => {
-    const {id} = req.params;
+    const { id } = req.params;
   
     try {
         const deletedProduct = await sql`
         DELETE FROM products WHERE id=${id} RETURNING *
-        `
+        `;
 
-        if(deleteProduct.length === 0){
+        if(deletedProduct.length === 0){
             return res.status(404).json({
-                success:false, message: "Product not found"
+                success:false, 
+                message: "Product not found"
             });
         }
 
-        req.status(200).json({ success:true, data: deleteProduct[0]})
+        res.status(200).json({ success:true, data: deletedProduct[0]})
     } catch (error) {
         console.log("Delete product error", error);
         res.status(500).json({ success:false, message: "Internal Server Error"});
